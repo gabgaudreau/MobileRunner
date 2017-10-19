@@ -13,12 +13,12 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Coins
+  - Obstacle
+  - Powerup
+  - Pit
+  - GravityTriggerEnd
+  - GravityTriggerStart
   - 
   - 
   - 
