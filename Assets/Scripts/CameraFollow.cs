@@ -7,14 +7,14 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour {
     [SerializeField]
-    GameObject player;
-    private float yOffset = 5;
-    private float zOffset = -10;
+    GameObject followTarget;
+    private const float Y_OFFSET = 5;
+    private const float Z_OFFSET = -10;
 
     /// <summary>
     /// This update will make sure that the camera follows the player at a specific distance, constantly.
     /// </summary>
 	void Update () {
-        transform.position = new Vector3(player.transform.position.x, player.transform.position.y + yOffset, player.transform.position.z + zOffset);
+        transform.position = new Vector3(followTarget.transform.position.x, followTarget.transform.position.y + Y_OFFSET, followTarget.transform.position.z + Z_OFFSET);
 	}
 }
