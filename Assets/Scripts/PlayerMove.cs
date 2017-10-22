@@ -14,22 +14,25 @@ public class PlayerMove : MonoBehaviour {
     private const float X_ANGLE_CAMERA = 25.0f;
     private const float X_VALUE_RIGHT_LEVEL = 250.0f;
     private const float X_VALUE_LEFT_LEVEL = -250.0f;
-    private const float Y_VALUE_PLAYER = 1.25f;
-    private enum State { LEFT, FORWARD, RIGHT};
+    private const float X_VALUE_DIRLIGHT = 50.0f;
+    private const float Y_VALUE_PLAYER = 1.18f;
+    private enum State { LEFT, FORWARD, RIGHT };
     private State state;
     private float difficulty;
-    private bool isTransitioning;
+    private bool isTransitioning, isTurningRight, isTurningLeft;
     private int lane; //0 = left, 1 = middle, 2 = right
     private Rigidbody rb;
     [SerializeField]
     GameObject respawnMiddle, respawnRight, respawnLeft;
     [SerializeField]
     GameObject[] respawns;
+    [SerializeField]
+    GameObject dirLight;
 
     /// <summary>
     /// Start function, initiates some variables.
     /// </summary>
-	void Start () {
+	void Start() {
         difficulty = 1.0f;
         lane = 1;
         rb = GetComponent<Rigidbody>();
@@ -41,10 +44,12 @@ public class PlayerMove : MonoBehaviour {
     /// Button function to move Left, called by pressing the arrow buttons on the screen.
     /// </summary>
     public void OnClickLeft() {
-        if (!isTransitioning && Input.GetKeyDown(KeyCode.Q) && lane != 0) {
+        if (!isTransitioning && lane != 0) {
             if (state == State.FORWARD)
                 transform.position = new Vector3(transform.position.x - LANE_WIDTH, transform.position.y, transform.position.z);
-            else
+            else if (state == State.RIGHT)
+                transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + LANE_WIDTH);
+            else if (state == State.LEFT)
                 transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z - LANE_WIDTH);
             lane--;
         }
@@ -54,10 +59,12 @@ public class PlayerMove : MonoBehaviour {
     /// Button function to move Right, called by pressing the arrow buttons on the screen.
     /// </summary>
     public void OnClickRight() {
-        if (!isTransitioning && Input.GetKeyDown(KeyCode.E) && lane != 2) {
+        if (!isTransitioning && lane != 2) {
             if (state == State.FORWARD)
                 transform.position = new Vector3(transform.position.x + LANE_WIDTH, transform.position.y, transform.position.z);
-            else
+            else if (state == State.RIGHT)
+                transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z - LANE_WIDTH);
+            else if (state == State.LEFT)
                 transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + LANE_WIDTH);
             lane++;
         }
@@ -70,20 +77,51 @@ public class PlayerMove : MonoBehaviour {
         //REMOVE KEYBOARD INPUT WHEN DONE WITH IT.
         if (!isTransitioning) {
             if (Input.GetKeyDown(KeyCode.Q) && lane != 0) {
-                if(state == State.FORWARD)
+                if (state == State.FORWARD)
                     transform.position = new Vector3(transform.position.x - LANE_WIDTH, transform.position.y, transform.position.z);
-                else
+                else if (state == State.RIGHT)
+                    transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + LANE_WIDTH);
+                else if (state == State.LEFT)
                     transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z - LANE_WIDTH);
                 lane--;
             }
             if (Input.GetKeyDown(KeyCode.E) && lane != 2) {
-                if(state == State.FORWARD)
+                if (state == State.FORWARD)
                     transform.position = new Vector3(transform.position.x + LANE_WIDTH, transform.position.y, transform.position.z);
-                else
+                else if (state == State.RIGHT)
+                    transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z - LANE_WIDTH);
+                else if (state == State.LEFT)
                     transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + LANE_WIDTH);
                 lane++;
             }
         }
+        // Player and camera rotation here.
+        if (isTurningLeft)
+            StartCoroutine(RotateLeft());
+        else if (isTurningRight)
+            StartCoroutine(RotateRight());
+    }
+
+    /// <summary>
+    /// Function that handles the rotation of the player (and the camera) for a smooth-looking turn, Rsight turn.
+    /// </summary>
+    /// <returns>Wait for seconds</returns>
+    IEnumerator RotateRight() {
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 90, 0), 3.5f * Time.deltaTime);
+        yield return new WaitForSeconds(2.0f);
+        transform.rotation = Quaternion.Euler(0, 90, 0);
+        isTurningRight = false;
+    }
+
+    /// <summary>
+    /// Function that handles the rotation of the player (and the camera) for a smooth-looking turn, Left turn.
+    /// </summary>
+    /// <returns>Wait for seconds</returns>
+    IEnumerator RotateLeft() {
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, -90, 0), 3.5f * Time.deltaTime);
+        yield return new WaitForSeconds(2.0f);
+        transform.rotation = Quaternion.Euler(0, -90, 0);
+        isTurningLeft = false;
     }
 
     /// <summary>
@@ -92,32 +130,32 @@ public class PlayerMove : MonoBehaviour {
     /// </summary>
     /// <param name="col">Object that is the trigger</param>
     void OnTriggerEnter(Collider col) {
-        if(col.gameObject.layer == LayerMask.NameToLayer("End")) {
+        if (col.gameObject.layer == LayerMask.NameToLayer("End")) {
             state = State.FORWARD;
             int respawnIndex = Mathf.RoundToInt(Random.Range(0, 3)) * 3 + lane; // 0 = left, 1 = forward, 2 = right
             difficulty += DIFFICULTY_INCREASE;
             transform.position = respawns[respawnIndex].transform.position;
-            Camera.main.transform.rotation = Quaternion.Euler(X_ANGLE_CAMERA, 0, 0);
+            transform.rotation = Quaternion.Euler(0, 0, 0);
             rb.velocity = Vector3.zero;
+            dirLight.transform.rotation = Quaternion.Euler(X_VALUE_DIRLIGHT, 0, 0);
             rb.AddForce(Vector3.forward * PLAYER_MOVE_SPEED * difficulty);
-            CameraFollow.instance.SetState("FORWARD");
         }
-        else if(col.gameObject.layer == LayerMask.NameToLayer("TurnLeft")) {
+        else if (col.gameObject.layer == LayerMask.NameToLayer("TurnLeft")) {
             state = State.LEFT;
+            lane = 1;
+            isTurningLeft = true;
             transform.position = new Vector3(X_VALUE_LEFT_LEVEL, Y_VALUE_PLAYER, Z_VALUE_TURN);
-            transform.rotation = Quaternion.Euler(0, -90, 0);
             rb.velocity = Vector3.zero;
-            CameraFollow.instance.SetState("LEFT");
-            Camera.main.transform.rotation = Quaternion.Euler(X_ANGLE_CAMERA, -90, 0);
+            dirLight.transform.rotation = Quaternion.Euler(X_VALUE_DIRLIGHT, -90, 0);
             rb.AddForce(Vector3.left * PLAYER_MOVE_SPEED * difficulty);
         }
         else if (col.gameObject.layer == LayerMask.NameToLayer("TurnRight")) {
             state = State.RIGHT;
-            transform.position = new Vector3(X_VALUE_RIGHT_LEVEL, Y_VALUE_PLAYER, Z_VALUE_TURN); 
-            transform.rotation = Quaternion.Euler(0, 90, 0);
+            lane = 1;
+            isTurningRight = true;
+            transform.position = new Vector3(X_VALUE_RIGHT_LEVEL, Y_VALUE_PLAYER, Z_VALUE_TURN);
             rb.velocity = Vector3.zero;
-            CameraFollow.instance.SetState("RIGHT");
-            Camera.main.transform.rotation = Quaternion.Euler(X_ANGLE_CAMERA, 90, 0);
+            dirLight.transform.rotation = Quaternion.Euler(X_VALUE_DIRLIGHT, 90, 0);
             rb.AddForce(Vector3.right * PLAYER_MOVE_SPEED * difficulty);
         }
     }
