@@ -16,14 +16,13 @@ public class PlayerMove : MonoBehaviour {
     private const float X_VALUE_LEFT_LEVEL = -250.0f;
     private const float X_VALUE_DIRLIGHT = 50.0f;
     private const float Y_VALUE_PLAYER = 1.18f;
+    private const float ROTATION_SPEED = 3.5f;
     private enum State { LEFT, FORWARD, RIGHT };
     private State state;
     private float difficulty;
-    private bool isTransitioning, isTurningRight, isTurningLeft;
+    private bool isTransitioning, isTurningRight, isTurningLeft; //istransitioning now unused? will i need this for something else down the line??
     private int lane; //0 = left, 1 = middle, 2 = right
     private Rigidbody rb;
-    [SerializeField]
-    GameObject respawnMiddle, respawnRight, respawnLeft;
     [SerializeField]
     GameObject[] respawns;
     [SerializeField]
@@ -103,12 +102,12 @@ public class PlayerMove : MonoBehaviour {
     }
 
     /// <summary>
-    /// Function that handles the rotation of the player (and the camera) for a smooth-looking turn, Rsight turn.
+    /// Function that handles the rotation of the player (and the camera) for a smooth-looking turn, Right turn.
     /// </summary>
     /// <returns>Wait for seconds</returns>
     IEnumerator RotateRight() {
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 90, 0), 3.5f * Time.deltaTime);
-        yield return new WaitForSeconds(2.0f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, 90, 0), ROTATION_SPEED * Time.deltaTime);
+        yield return new WaitForSeconds(1.5f);
         transform.rotation = Quaternion.Euler(0, 90, 0);
         isTurningRight = false;
     }
@@ -118,8 +117,8 @@ public class PlayerMove : MonoBehaviour {
     /// </summary>
     /// <returns>Wait for seconds</returns>
     IEnumerator RotateLeft() {
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, -90, 0), 3.5f * Time.deltaTime);
-        yield return new WaitForSeconds(2.0f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, -90, 0), ROTATION_SPEED * Time.deltaTime);
+        yield return new WaitForSeconds(1.5f);
         transform.rotation = Quaternion.Euler(0, -90, 0);
         isTurningLeft = false;
     }
