@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class Pathway : MonoBehaviour {
     [SerializeField]
-    GameObject startingPoint, test;
+    GameObject startingPoint, obstaclePrefab;
     [SerializeField]
     int depth, orientation; // orientation 0 = left, 1 = forward, 2 = right
     private const float LANE_WIDTH = 0.75f;
@@ -102,7 +102,7 @@ public class Pathway : MonoBehaviour {
             //Instantiate Obstacles
             foreach (Node n in _justNodes) {
                 if (n.isObstacle)
-                    _obstacles.Add(Instantiate(test, n.worldPos, Quaternion.identity));
+                    _obstacles.Add(Instantiate(obstaclePrefab, n.worldPos, Quaternion.identity));
             }
         }
     }

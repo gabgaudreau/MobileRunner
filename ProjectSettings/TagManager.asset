@@ -17,8 +17,8 @@ TagManager:
   - Obstacle
   - Powerup
   - End
-  - GravityTriggerEnd
-  - GravityTriggerStart
+  - 
+  - 
   - TurnRight
   - TurnLeft
   - Player

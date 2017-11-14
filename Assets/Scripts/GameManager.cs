@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour {
     private Level previousLevel;
     private Level currentLevel;
     [SerializeField]
-    GameObject test;
+    GameObject obstaclePrefab;
 
     /// <summary>
     /// Will generate all nodes in all levels.
@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour {
         }
         foreach (Node n in first.justNodes) {
             if (n.isObstacle)
-                first.obstacles.Add(Instantiate(test, n.worldPos, Quaternion.identity));
+                first.obstacles.Add(Instantiate(obstaclePrefab, n.worldPos, Quaternion.identity));
         }
     }
 }
