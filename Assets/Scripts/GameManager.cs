@@ -6,7 +6,7 @@ Project: MobileRunner
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
-    public static GameManager gm;
+    public static GameManager gm; //Singleton.
     [SerializeField]
     Level[] levels; // 0 = left, 1 = forward, 2 = right
     private Level previousLevel;
@@ -33,9 +33,10 @@ public class GameManager : MonoBehaviour {
     }
 
     /// <summary>
-    /// 
+    /// Changes level, calls transferObstacles and removes obstacles once the transfer is done, then instantiates 
+    /// all the obstacles of the current level.
     /// </summary>
-    /// <param name="i"></param>
+    /// <param name="i">int level</param>
     public void SetCurrentLevel(int i) {
         previousLevel = currentLevel;
         currentLevel = levels[i];
@@ -48,10 +49,12 @@ public class GameManager : MonoBehaviour {
     }
 
     /// <summary>
-    /// 
+    /// This method takes 2 pathways as parameter, the last of the previous level and the first of the next level
+    /// In order to keep the infinite scrolling illusion, this method takes the isObstacle bool of all the nodes in the last pathway
+    /// of the prev level and copies it into the nodes of the first pathway of the next level.
     /// </summary>
-    /// <param name="last"></param>
-    /// <param name="first"></param>
+    /// <param name="last">Pathway last</param>
+    /// <param name="first">Pathway first</param>
     void TransferObstacles(Pathway last, Pathway first) {
         int length = last.justNodes.Count;
         for (int i = 0; i < length; i++) {

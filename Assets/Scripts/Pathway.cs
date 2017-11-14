@@ -21,7 +21,7 @@ public class Pathway : MonoBehaviour {
         set { _obstacles = value; }
     }
 
-    private List<Node> _justNodes = new List<Node>();    
+    private List<Node> _justNodes = new List<Node>(); //This list of nodes is how I managed to transfer the obstacles from a pathway to another for the infinite scrolling illusion.
     public List<Node> justNodes {
         get { return _justNodes; }
         set { _justNodes = value; }
@@ -34,7 +34,7 @@ public class Pathway : MonoBehaviour {
     }
 
     /// <summary>
-    /// 
+    /// Destroys all obstacles in a pathway as well as resets all of its nodes' isObstacle bool.
     /// </summary>
     public void RemoveObstacles() {
         foreach(Node n in _justNodes) {
@@ -83,7 +83,6 @@ public class Pathway : MonoBehaviour {
     /// 
     /// </summary>
     public void GenerateObstacles() {
-        Debug.Log("Generating..");
         foreach (List<Node> subList in _nodes) { // we're in the each sublist here
             int safe = Mathf.RoundToInt(Random.Range(0, 3));
             switch (safe) {
@@ -100,6 +99,7 @@ public class Pathway : MonoBehaviour {
                     subList[1].isObstacle = true;
                     break;
             }
+            //Instantiate Obstacles
             foreach (Node n in _justNodes) {
                 if (n.isObstacle)
                     _obstacles.Add(Instantiate(test, n.worldPos, Quaternion.identity));
@@ -108,9 +108,9 @@ public class Pathway : MonoBehaviour {
     }
 
     /// <summary>
-    /// 
+    /// OnTriggerEnter function used to check when the player collides with the end of a pathway, hence triggering the removeObstacle method.
     /// </summary>
-    /// <param name="col"></param>
+    /// <param name="col">Collider, in this case, only the player object will trigger this.</param>
     void OnTriggerEnter(Collider col) {
         if(col.gameObject.layer == LayerMask.NameToLayer("Player")){
             RemoveObstacles();
