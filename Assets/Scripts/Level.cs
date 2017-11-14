@@ -6,7 +6,7 @@ Project: MobileRunner
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Level : MonoBehaviour {
+public class Level : MonoBehaviour {    
     [SerializeField]
     private List<Pathway> _pathways = new List<Pathway>();
     public List<Pathway> pathways {

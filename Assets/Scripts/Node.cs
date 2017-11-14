@@ -6,6 +6,13 @@ Project: MobileRunner
 using UnityEngine;
 
 public class Node : MonoBehaviour {
+    private bool _isObstacle;
+            
+    public bool isObstacle {
+        get { return _isObstacle; }
+        set { _isObstacle = value; }
+    }
+
     private Vector3 _worldPos;
     public Vector3 worldPos {
         get { return _worldPos; }

@@ -14,11 +14,35 @@ public class Pathway : MonoBehaviour {
     private const float LANE_WIDTH = 0.75f;
     private const float DIST_BETWEEN_OBSTACLES = 8.0f;
     private const float NUM_ROWS_OBSTACLES = 5.0f;
+    private List<GameObject> _obstacles =  new List<GameObject>();
+
+    public List<GameObject> obstacles { 
+        get { return _obstacles; }
+        set { _obstacles = value; }
+    }
+
+    private List<Node> _justNodes = new List<Node>();    
+    public List<Node> justNodes {
+        get { return _justNodes; }
+        set { _justNodes = value; }
+    }
 
     private List<List<Node>> _nodes = new List<List<Node>>();
     public List<List<Node>> nodes {
         get { return _nodes; }
         set { _nodes = value; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void RemoveObstacles() {
+        foreach(Node n in _justNodes) {
+            n.isObstacle = false;
+        }
+        foreach (GameObject g in _obstacles) {
+            Destroy(g);
+        }
     }
 
     /// <summary>
@@ -45,16 +69,51 @@ public class Pathway : MonoBehaviour {
                 right = new Node(new Vector3(currPos.x, currPos.y, currPos.z - LANE_WIDTH), i);
                 currPos += new Vector3(DIST_BETWEEN_OBSTACLES, 0, 0);
             }
+            _justNodes.Add(left);
+            _justNodes.Add(mid);
+            _justNodes.Add(right);
             currNodes.Add(left);
             currNodes.Add(mid);
             currNodes.Add(right);
             _nodes.Add(currNodes);
         }
-        //for testing
-        foreach(List<Node> l in _nodes) {
-            foreach(Node n in l) {
-                Instantiate(test, n.worldPos + new Vector3(0, 1, 0), Quaternion.identity);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void GenerateObstacles() {
+        Debug.Log("Generating..");
+        foreach (List<Node> subList in _nodes) { // we're in the each sublist here
+            int safe = Mathf.RoundToInt(Random.Range(0, 3));
+            switch (safe) {
+                case 0:
+                    subList[1].isObstacle = true;
+                    subList[2].isObstacle = true;
+                    break;
+                case 1:
+                    subList[0].isObstacle = true;
+                    subList[2].isObstacle = true;
+                    break;
+                case 2:
+                    subList[0].isObstacle = true;
+                    subList[1].isObstacle = true;
+                    break;
             }
+            foreach (Node n in _justNodes) {
+                if (n.isObstacle)
+                    _obstacles.Add(Instantiate(test, n.worldPos, Quaternion.identity));
+            }
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="col"></param>
+    void OnTriggerEnter(Collider col) {
+        if(col.gameObject.layer == LayerMask.NameToLayer("Player")){
+            RemoveObstacles();
         }
     }
 }

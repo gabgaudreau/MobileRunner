@@ -130,8 +130,11 @@ public class PlayerMove : MonoBehaviour {
     /// <param name="col">Object that is the trigger</param>
     void OnTriggerEnter(Collider col) {
         if (col.gameObject.layer == LayerMask.NameToLayer("End")) {
+            Debug.Log("END");
             state = State.FORWARD;
-            int respawnIndex = Mathf.RoundToInt(Random.Range(0, 3)) * 3 + lane; // 0 = left, 1 = forward, 2 = right
+            int nextLevel = 1; //Mathf.RoundToInt(Random.Range(0, 3));
+            GameManager.gm.SetCurrentLevel(nextLevel);
+            int respawnIndex = nextLevel * 3 + lane; // 0 = left, 1 = forward, 2 = right
             difficulty += DIFFICULTY_INCREASE;
             transform.position = respawns[respawnIndex].transform.position;
             transform.rotation = Quaternion.Euler(0, 0, 0);
