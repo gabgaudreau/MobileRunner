@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour {
                 pw.GenerateNodes();
             }
         }
-        currentLevel = levels[1];
+        currentLevel = levels[1]; // Start on the middle level
         foreach (Pathway p in currentLevel.pathways) {
             p.GenerateObstacles();
         }
@@ -68,12 +68,13 @@ public class GameManager : MonoBehaviour {
     }
 }
 //TODO:
-//3..2..1..GO then start
 //main menu, box style menu, rotating camera between the different panels
+//fonts for menu
+//menu manager
 //pause button in top left corner
 //find a player asset
 //power ups allow the player to shoot obstables, shoot idk what kind of projectiles yet
 //pick up a key to open the door
 //walls and obstacles need to actually hit the player and do damage
 //player flashes after getting hit, signaling temporary immunity
-//skybox
+//3..2..1..GO then start
